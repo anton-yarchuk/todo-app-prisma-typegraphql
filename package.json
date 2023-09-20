@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "keywords": [],
+  "type": "module",
   "author": "",
   "license": "ISC",
   "scripts": {
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@types/node": "20.6.3",
     "@types/ws": "8.5.5",
+    "prettier": "^3.0.3",
     "prisma": "5.3.1",
     "ts-node": "10.9.1",
     "ts-node-dev": "2.0.0",
