@@ -9,30 +9,32 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(uuid())
-  lists List[]
-  Todo  Todo[]
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lists     List[]
+  Todo      Todo[]
 }
 
 model List {
-  id         String    @id @default(uuid())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  archivedAt DateTime? @updatedAt
-  todos      Todo[]
-  User       User?     @relation(fields: [userId], references: [id])
-  userId     String?
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  archivedAt  DateTime? @updatedAt
+  todos       Todo[]
+  owner       User?     @relation(fields: [ownerUserId], references: [id])
+  ownerUserId String?
 }
 
 model Todo {
-  id         Int       @id @default(autoincrement())
-  title      String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  doneAt     DateTime?
-  archivedAt DateTime?
-  user       User      @relation(fields: [userId], references: [id])
-  userId     String
-  List       List?     @relation(fields: [listId], references: [id])
-  listId     String?
+  id          Int       @id @default(autoincrement())
+  title       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+  archivedAt  DateTime?
+  owner       User      @relation(fields: [ownerUserId], references: [id])
+  ownerUserId String
+  List        List?     @relation(fields: [listId], references: [id])
+  listId      String?
 }
