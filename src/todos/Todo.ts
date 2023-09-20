@@ -18,10 +18,13 @@ export class Todo {
   updatedAt: Date;
 
   @Field({ nullable: true })
-  doneAt?: Date | null;
+  dueDate?: Date | null;
 
   @Field({ nullable: true })
-  archivedAt?: Date | null;
+  completedAt?: Date | null;
+
+  @Field({ nullable: true })
+  deletedAt?: Date | null;
 
   @Field((type) => List)
   list: List;

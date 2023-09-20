@@ -18,10 +18,7 @@ export class List {
   updatedAt: Date;
 
   @Field({ nullable: true })
-  doneAt?: Date | null;
-
-  @Field({ nullable: true })
-  archivedAt?: Date | null;
+  deletedAt?: Date | null;
 
   @Field((type) => [Todo])
   todos: [Todo];
