@@ -13,7 +13,7 @@ export class TodoService {
       skip: args.skip,
       take: args.take,
       where: {
-        ownerUserId: ctx.userId,
+        ownerId: ctx.userId,
         completedAt: args.includeCompleted ? undefined : null,
         listId: args.listId,
         deletedAt: null,
@@ -48,18 +48,18 @@ export class TodoService {
 
   static async updateTodo(id: string, data: CreateTodoInput, ctx: Context) {
     return ctx.prisma.todo.update({
-      where: { id, ownerUserId: ctx.userId },
+      where: { id, ownerId: ctx.userId },
       data,
     });
   }
 
   static async toggleTodoCompletion(id: string, ctx: Context) {
     const todo = await ctx.prisma.todo.findUniqueOrThrow({
-      where: { id, ownerUserId: ctx.userId },
+      where: { id, ownerId: ctx.userId },
     });
 
     return ctx.prisma.todo.update({
-      where: { id, ownerUserId: ctx.userId },
+      where: { id, ownerId: ctx.userId },
       data: {
         completedAt: todo.completedAt ? null : new Date(),
       },
@@ -68,7 +68,7 @@ export class TodoService {
 
   static async deleteTodo(id: string, ctx: Context) {
     return ctx.prisma.todo.update({
-      where: { id, ownerUserId: ctx.userId },
+      where: { id, ownerId: ctx.userId },
       data: {
         deletedAt: new Date(),
       },

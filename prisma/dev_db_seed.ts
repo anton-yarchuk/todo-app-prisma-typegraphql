@@ -14,7 +14,7 @@ async function main() {
           todos: {
             create: {
               title: 'First todo, attached to the first list',
-              ownerUserId: process.env.MOCK_USER_ID,
+              ownerId: process.env.MOCK_USER_ID,
             },
           },
         },

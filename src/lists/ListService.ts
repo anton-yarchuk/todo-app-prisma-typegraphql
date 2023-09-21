@@ -8,7 +8,7 @@ export class ListService {
   static async getOwnLists(ctx: Context): Promise<List[]> {
     return ctx.prisma.list.findMany({
       where: {
-        ownerUserId: ctx.userId,
+        ownerId: ctx.userId,
         deletedAt: null,
       },
       orderBy: { title: 'asc' },
@@ -30,7 +30,7 @@ export class ListService {
 
   static async updateList(id: string, data: CreateListInput, ctx: Context) {
     return ctx.prisma.list.update({
-      where: { id, ownerUserId: ctx.userId },
+      where: { id, ownerId: ctx.userId },
       data,
     });
   }

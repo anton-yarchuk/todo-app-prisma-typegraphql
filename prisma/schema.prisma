@@ -18,14 +18,14 @@ model User {
 }
 
 model List {
-  id          String    @id @default(uuid())
-  title       String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  todos       Todo[]
-  owner       User?     @relation(fields: [ownerUserId], references: [id])
-  ownerUserId String?
+  id        String    @id @default(uuid())
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  todos     Todo[]
+  owner     User?     @relation(fields: [ownerId], references: [id])
+  ownerId   String?
 }
 
 model Todo {
@@ -36,8 +36,8 @@ model Todo {
   dueDate     DateTime?
   completedAt DateTime?
   deletedAt   DateTime?
-  owner       User      @relation(fields: [ownerUserId], references: [id])
-  ownerUserId String
+  owner       User      @relation(fields: [ownerId], references: [id])
+  ownerId     String
   list        List?     @relation(fields: [listId], references: [id])
   listId      String?
 }
