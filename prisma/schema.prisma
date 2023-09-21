@@ -22,7 +22,7 @@ model List {
   title       String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? @updatedAt
+  deletedAt   DateTime?
   todos       Todo[]
   owner       User?     @relation(fields: [ownerUserId], references: [id])
   ownerUserId String?
