@@ -9,12 +9,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  lists     List[]
-  todos     Todo[]
+  id          String        @id @default(uuid())
+  name        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  lists       List[]
+  todos       Todo[]
+  Integration Integration[]
 }
 
 model List {
@@ -29,15 +30,35 @@ model List {
 }
 
 model Todo {
-  id          String    @id @default(uuid())
-  title       String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  dueDate     DateTime?
-  completedAt DateTime?
-  deletedAt   DateTime?
-  owner       User      @relation(fields: [ownerId], references: [id])
-  ownerId     String
-  list        List?     @relation(fields: [listId], references: [id])
-  listId      String?
+  id                   String                @id @default(uuid())
+  title                String
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  dueDate              DateTime?
+  completedAt          DateTime?
+  deletedAt            DateTime?
+  owner                User                  @relation(fields: [ownerId], references: [id])
+  ownerId              String
+  list                 List?                 @relation(fields: [listId], references: [id])
+  listId               String?
+  externalTodoMappings ExternalTodoMapping[]
+}
+
+model Integration {
+  id                   String                @id @default(uuid())
+  type                 String
+  createdAt            DateTime              @default(now())
+  owner                User                  @relation(fields: [ownerId], references: [id])
+  ownerId              String
+  externalTodoMappings ExternalTodoMapping[]
+  details              Json // results to JSONB field in PG
+}
+
+model ExternalTodoMapping {
+  externalTodoId String      @id
+  todoId         String
+  todo           Todo        @relation(fields: [todoId], references: [id])
+  createdAt      DateTime    @default(now())
+  integration    Integration @relation(fields: [integrationId], references: [id])
+  integrationId  String
 }

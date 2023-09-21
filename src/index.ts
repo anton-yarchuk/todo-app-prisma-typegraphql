@@ -6,6 +6,7 @@ import { SortOrder, Context, context } from './common';
 import { TodoResolver } from './todos/TodoResolver';
 import { UserResolver } from './users/UserResolver';
 import { ListResolver } from './lists/ListResolver';
+import { IntegrationResolver } from './integrations/IntegrationResolver';
 
 (async () => {
   tq.registerEnumType(SortOrder, {
@@ -13,7 +14,7 @@ import { ListResolver } from './lists/ListResolver';
   });
 
   const schema = await tq.buildSchema({
-    resolvers: [TodoResolver, UserResolver, ListResolver],
+    resolvers: [TodoResolver, UserResolver, ListResolver, IntegrationResolver],
     scalarsMap: [{ type: Date, scalar: tq.GraphQLTimestamp }],
     validate: true,
   });
