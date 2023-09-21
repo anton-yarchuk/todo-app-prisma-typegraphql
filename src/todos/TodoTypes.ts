@@ -8,7 +8,6 @@ export class CreateTodoInput implements Partial<Todo> {
   @Length(1, 50)
   title: string;
 
-  // @ValidateNested() // TODO: do I need this?
   @Field({ nullable: true })
   dueDate?: Date;
 

@@ -8,7 +8,6 @@ import { List } from '../lists/List';
 // TODO: use @Service instead of static classes methods
 export class TodoService {
   static async getOwnTodos(args: TodosArgs, userId: string): Promise<Todo[]> {
-    console.log(args.listId);
     const data: Prisma.TodoFindManyArgs = {
       skip: args.skip,
       take: args.take,
