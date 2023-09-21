@@ -1,7 +1,8 @@
 import 'reflect-metadata';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { List } from '../lists/List';
-import { User } from '../user/User';
+import { User } from '../users/User';
+import { Length } from 'class-validator';
 
 @ObjectType()
 export class Todo {
@@ -9,6 +10,7 @@ export class Todo {
   readonly id: string;
 
   @Field()
+  @Length(1, 100)
   title: string;
 
   @Field()
@@ -26,9 +28,9 @@ export class Todo {
   @Field({ nullable: true })
   deletedAt?: Date | null;
 
-  @Field((type) => List)
-  list: List;
+  @Field((type) => List, { nullable: true })
+  list?: List | null;
 
   @Field((type) => User)
-  owner: User;
+  owner?: User;
 }
