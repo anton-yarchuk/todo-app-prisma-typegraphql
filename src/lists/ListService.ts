@@ -3,7 +3,6 @@ import { User } from '../users/User';
 import { List } from './List';
 import { CreateListInput } from './ListTypes';
 
-// TODO: use @Service instead of static classes methods
 export class ListService {
   static async getOwnLists(userId: string): Promise<List[]> {
     return prisma.list.findMany({

@@ -5,7 +5,6 @@ import { Prisma } from '@prisma/client';
 import { User } from '../users/User';
 import { List } from '../lists/List';
 
-// TODO: use @Service instead of static classes methods
 export class TodoService {
   static async getOwnTodos(args: TodosArgs, userId: string): Promise<Todo[]> {
     const data: Prisma.TodoFindManyArgs = {

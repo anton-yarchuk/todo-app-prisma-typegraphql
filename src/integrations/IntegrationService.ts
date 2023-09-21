@@ -1,13 +1,13 @@
 import { prisma } from '../common';
 import { Integration, TodoistIntegrationDetails } from './Integration';
+import { TodoistService } from './providers/TodoistService';
 
-// TODO: use @Service instead of static classes methods
 export class IntegrationService {
   static async connectToTodoistParty(
     userId: string,
     details: TodoistIntegrationDetails,
   ): Promise<Integration> {
-    return prisma.integration.create({
+    const createdIntegration = await prisma.integration.create({
       data: {
         type: 'TODOIST',
         ownerId: userId,
@@ -15,5 +15,12 @@ export class IntegrationService {
         details: { ...details },
       },
     });
+
+    // TODO: emit and event instead of blocking the request
+    await TodoistService.doInitialSync(createdIntegration);
+
+    return createdIntegration;
   }
+
+  // TODO: add createExternalTask / completeExternalTask
 }
