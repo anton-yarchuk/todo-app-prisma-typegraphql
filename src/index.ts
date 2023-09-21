@@ -12,7 +12,7 @@ import { UserResolver } from './users/UserResolver';
   });
 
   const schema = await tq.buildSchema({
-    resolvers: [],
+    resolvers: [TodoResolver, UserResolver],
     scalarsMap: [{ type: Date, scalar: tq.GraphQLTimestamp }],
     validate: true,
   });
