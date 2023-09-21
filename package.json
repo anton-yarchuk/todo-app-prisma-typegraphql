@@ -4,15 +4,19 @@
   "description": "",
   "main": "index.js",
   "keywords": [],
-  "type": "module",
   "author": "",
   "license": "ISC",
   "scripts": {
     "dev": "ts-node-dev --no-notify --respawn --transpile-only src/index.ts"
   },
+  "prisma": {
+    "seed": "ts-node prisma/dev_db_seed.ts"
+  },
   "dependencies": {
     "@apollo/server": "4.9.3",
-    "@prisma/client": "5.3.1",
+    "@prisma/client": "^5.3.1",
+    "class-validator": "^0.14.0",
+    "dotenv": "^16.3.1",
     "graphql": "16.8.1",
     "graphql-scalars": "1.22.2",
     "reflect-metadata": "0.1.13",
