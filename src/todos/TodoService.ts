@@ -1,19 +1,19 @@
 import { Todo } from './Todo';
 import { CreateTodoInput, TodosArgs } from './TodoTypes';
-import { Context } from '../common';
+import { prisma } from '../common';
 import { Prisma } from '@prisma/client';
 import { User } from '../users/User';
 import { List } from '../lists/List';
 
 // TODO: use @Service instead of static classes methods
 export class TodoService {
-  static async getOwnTodos(args: TodosArgs, ctx: Context): Promise<Todo[]> {
+  static async getOwnTodos(args: TodosArgs, userId: string): Promise<Todo[]> {
     console.log(args.listId);
     const data: Prisma.TodoFindManyArgs = {
       skip: args.skip,
       take: args.take,
       where: {
-        ownerId: ctx.userId,
+        ownerId: userId,
         completedAt: args.includeCompleted ? undefined : null,
         listId: args.listId,
         deletedAt: null,
@@ -25,16 +25,16 @@ export class TodoService {
       orderBy: { dueDate: { sort: 'asc', nulls: 'last' } },
     };
 
-    return ctx.prisma.todo.findMany(data);
+    return prisma.todo.findMany(data);
   }
 
-  static async createTodo(input: CreateTodoInput, ctx: Context) {
+  static async createTodo(input: CreateTodoInput, userId: string) {
     const data: Prisma.TodoCreateInput = {
       title: input.title,
       dueDate: input.dueDate,
       owner: {
         connect: {
-          id: ctx.userId,
+          id: userId,
         },
       },
     };
@@ -43,40 +43,40 @@ export class TodoService {
       data.list = { connect: { id: input.listId } };
     }
 
-    return ctx.prisma.todo.create({ data });
+    return prisma.todo.create({ data });
   }
 
-  static async updateTodo(id: string, data: CreateTodoInput, ctx: Context) {
-    return ctx.prisma.todo.update({
-      where: { id, ownerId: ctx.userId },
+  static async updateTodo(id: string, data: CreateTodoInput, userId: string) {
+    return prisma.todo.update({
+      where: { id, ownerId: userId },
       data,
     });
   }
 
-  static async toggleTodoCompletion(id: string, ctx: Context) {
-    const todo = await ctx.prisma.todo.findUniqueOrThrow({
-      where: { id, ownerId: ctx.userId },
+  static async toggleTodoCompletion(id: string, userId: string) {
+    const todo = await prisma.todo.findUniqueOrThrow({
+      where: { id, ownerId: userId },
     });
 
-    return ctx.prisma.todo.update({
-      where: { id, ownerId: ctx.userId },
+    return prisma.todo.update({
+      where: { id, ownerId: userId },
       data: {
         completedAt: todo.completedAt ? null : new Date(),
       },
     });
   }
 
-  static async deleteTodo(id: string, ctx: Context) {
-    return ctx.prisma.todo.update({
-      where: { id, ownerId: ctx.userId },
+  static async deleteTodo(id: string, userId: string) {
+    return prisma.todo.update({
+      where: { id, ownerId: userId },
       data: {
         deletedAt: new Date(),
       },
     });
   }
 
-  static async getTodoOwner(id: string, ctx: Context): Promise<User> {
-    return ctx.prisma.todo
+  static async getTodoOwner(id: string): Promise<User> {
+    return prisma.todo
       .findUniqueOrThrow({
         where: {
           id,
@@ -85,8 +85,8 @@ export class TodoService {
       .owner();
   }
 
-  static async getTodoList(todoId: string, ctx: Context): Promise<List | null> {
-    return ctx.prisma.todo
+  static async getTodoList(todoId: string): Promise<List | null> {
+    return prisma.todo
       .findUniqueOrThrow({
         where: {
           id: todoId,

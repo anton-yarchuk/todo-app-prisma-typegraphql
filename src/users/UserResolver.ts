@@ -21,11 +21,11 @@ export class UserResolver {
     @Ctx() ctx: Context,
   ): Promise<Todo[]> {
     // ignoring root user since getOwnTodos are forcing userId based on the context
-    return TodoService.getOwnTodos(args, ctx);
+    return TodoService.getOwnTodos(args, ctx.userId);
   }
 
   @FieldResolver()
   lists(@Root() user: User, @Ctx() ctx: Context): Promise<List[]> {
-    return UserService.getUserLists(user.id, ctx);
+    return UserService.getUserLists(user.id);
   }
 }

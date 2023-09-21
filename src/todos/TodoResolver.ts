@@ -24,7 +24,7 @@ export class TodoResolver {
 
   @Query((returns) => [Todo])
   async todos(@Args() args: TodosArgs, @Ctx() ctx: Context) {
-    return TodoService.getOwnTodos(args, ctx);
+    return TodoService.getOwnTodos(args, ctx.userId);
   }
 
   /**
@@ -33,7 +33,7 @@ export class TodoResolver {
 
   @Mutation((returns) => Todo)
   async createTodo(@Arg('data') input: CreateTodoInput, @Ctx() ctx: Context) {
-    return TodoService.createTodo(input, ctx);
+    return TodoService.createTodo(input, ctx.userId);
   }
 
   @Mutation((returns) => Todo)
@@ -42,17 +42,17 @@ export class TodoResolver {
     @Arg('data') data: CreateTodoInput,
     @Ctx() ctx: Context,
   ) {
-    return TodoService.updateTodo(id, data, ctx);
+    return TodoService.updateTodo(id, data, ctx.userId);
   }
 
   @Mutation((returns) => Todo)
   async toggleTodoCompletion(@Arg('id') id: string, @Ctx() ctx: Context) {
-    return TodoService.toggleTodoCompletion(id, ctx);
+    return TodoService.toggleTodoCompletion(id, ctx.userId);
   }
 
   @Mutation((returns) => Todo)
   async deleteTodo(@Arg('id') id: string, @Ctx() ctx: Context) {
-    return TodoService.deleteTodo(id, ctx);
+    return TodoService.deleteTodo(id, ctx.userId);
   }
 
   /**
@@ -61,11 +61,11 @@ export class TodoResolver {
 
   @FieldResolver()
   owner(@Root() todo: Todo, @Ctx() ctx: Context): Promise<User> {
-    return TodoService.getTodoOwner(todo.id, ctx);
+    return TodoService.getTodoOwner(todo.id);
   }
 
   @FieldResolver()
   list(@Root() todo: Todo, @Ctx() ctx: Context): Promise<List | null> {
-    return TodoService.getTodoList(todo.id, ctx);
+    return TodoService.getTodoList(todo.id);
   }
 }

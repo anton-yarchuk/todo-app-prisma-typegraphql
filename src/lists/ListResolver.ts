@@ -26,7 +26,7 @@ export class ListResolver {
 
   @Query((returns) => [List])
   async lists(@Ctx() ctx: Context) {
-    return ListService.getOwnLists(ctx);
+    return ListService.getOwnLists(ctx.userId);
   }
 
   /**
@@ -35,7 +35,7 @@ export class ListResolver {
 
   @Mutation((returns) => List)
   async createList(@Arg('data') input: CreateListInput, @Ctx() ctx: Context) {
-    return ListService.createList(input, ctx);
+    return ListService.createList(input, ctx.userId);
   }
 
   @Mutation((returns) => List)
@@ -44,7 +44,7 @@ export class ListResolver {
     @Arg('data') data: CreateListInput,
     @Ctx() ctx: Context,
   ) {
-    return ListService.updateList(id, data, ctx);
+    return ListService.updateList(id, data, ctx.userId);
   }
 
   /**
@@ -59,11 +59,11 @@ export class ListResolver {
   ): Promise<Todo[]> {
     args.listId = list.id;
 
-    return TodoService.getOwnTodos(args, ctx);
+    return TodoService.getOwnTodos(args, ctx.userId);
   }
 
   @FieldResolver()
   owner(@Root() list: List, @Ctx() ctx: Context): Promise<User> {
-    return ListService.getListOwner(list.id, ctx);
+    return ListService.getListOwner(list.id);
   }
 }
