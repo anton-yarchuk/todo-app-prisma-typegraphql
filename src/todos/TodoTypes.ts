@@ -20,12 +20,12 @@ export class CreateTodoInput implements Partial<Todo> {
 export class TodosArgs {
   @Field((type) => Int, { defaultValue: 0 })
   @Min(0)
-  skip: number = 0;
+  skip?: number = 0;
 
   @Field((type) => Int, { defaultValue: 20 })
   @Min(1)
   @Max(100)
-  take: number = 20;
+  take?: number = 20;
 
   @Field({ nullable: true })
   @Length(3, 30)

@@ -8,8 +8,8 @@ import { List } from '../lists/List';
 export class TodoService {
   static async getOwnTodos(args: TodosArgs, userId: string): Promise<Todo[]> {
     const data: Prisma.TodoFindManyArgs = {
-      skip: args.skip,
-      take: args.take,
+      skip: args.skip || 0,
+      take: args.take || 20,
       where: {
         ownerId: userId,
         completedAt: args.includeCompleted ? undefined : null,

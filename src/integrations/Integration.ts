@@ -1,7 +1,13 @@
 import 'reflect-metadata';
 import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
 import { User } from '../users/User';
-import { Prisma } from '@prisma/client';
+import { JsonObject } from '@prisma/client/runtime/library';
+
+@ObjectType()
+export class TodoistIntegrationDetails {
+  @Field()
+  apiKey: string;
+}
 
 @ObjectType()
 export class Integration {
@@ -15,10 +21,13 @@ export class Integration {
   createdAt: Date;
 
   @Field((type) => TodoistIntegrationDetails)
-  details: Prisma.JsonValue;
+  details: JsonObject;
 
   @Field((type) => User)
   owner?: User;
+
+  // no @Field decorator, field is not accessible via API calls
+  ownerId: string;
 }
 
 enum IntegrationTypeEnum {
@@ -28,9 +37,3 @@ enum IntegrationTypeEnum {
 registerEnumType(IntegrationTypeEnum, {
   name: 'IntegrationTypeEnum',
 });
-
-@ObjectType()
-export class TodoistIntegrationDetails {
-  @Field()
-  apiKey: string;
-}
