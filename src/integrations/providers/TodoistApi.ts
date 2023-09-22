@@ -25,7 +25,7 @@ export class TodoistApiClient {
    * Created new Todoist Items and returns mapping between temp_id(TodoId) and Todoist ItemId
    */
   async createItemsInInbox(
-    data: TodoistItemCreationCommand[],
+    data: TodoistItemCreateCommand[],
   ): Promise<{ [key: string]: string }[]> {
     const response = await this.executeRequest({
       commands: JSON.stringify(
@@ -40,6 +40,23 @@ export class TodoistApiClient {
       ),
     });
     return response?.data?.temp_id_mapping;
+  }
+
+  async toggleItemCompletion(
+    itemId: string,
+    isCompleted: boolean,
+  ): Promise<any> {
+    return this.executeRequest({
+      commands: JSON.stringify([
+        {
+          type: isCompleted ? 'item_complete' : 'item_uncomplete',
+          uuid: randomUUID(),
+          args: {
+            id: itemId,
+          },
+        },
+      ]),
+    });
   }
 
   private async executeRequest(data: object): Promise<any> {
@@ -57,7 +74,7 @@ export interface TodoistItem {
   content: string;
 }
 
-export interface TodoistItemCreationCommand {
+export interface TodoistItemCreateCommand {
   content: string;
   temp_id: string;
 }

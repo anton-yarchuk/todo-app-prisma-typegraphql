@@ -30,7 +30,7 @@ export class Integration {
   ownerId: string;
 }
 
-enum IntegrationTypeEnum {
+export enum IntegrationTypeEnum {
   TODOIST = 'TODOIST',
 }
 

@@ -4,6 +4,7 @@ import { prisma } from '../common';
 import { Prisma } from '@prisma/client';
 import { User } from '../users/User';
 import { List } from '../lists/List';
+import { IntegrationService } from '../integrations/IntegrationService';
 
 export class TodoService {
   static async getOwnTodos(args: TodosArgs, userId: string): Promise<Todo[]> {
@@ -41,7 +42,12 @@ export class TodoService {
       data.list = { connect: { id: input.listId } };
     }
 
-    return prisma.todo.create({ data });
+    const createdTodo = await prisma.todo.create({ data });
+
+    // TODO: fire an event instead and handle integrations separately instead of blocking the API call
+    await IntegrationService.createTaskInExternalServices(createdTodo, userId);
+
+    return createdTodo;
   }
 
   static async updateTodo(id: string, data: CreateTodoInput, userId: string) {
@@ -56,12 +62,19 @@ export class TodoService {
       where: { id, ownerId: userId },
     });
 
-    return prisma.todo.update({
+    const updatedTodo = await prisma.todo.update({
       where: { id, ownerId: userId },
       data: {
         completedAt: todo.completedAt ? null : new Date(),
       },
     });
+
+    // TODO: fire an event instead and handle integrations separately instead of blocking the API call
+    await IntegrationService.toggleTaskCompletionInExternalServices(
+      updatedTodo,
+    );
+
+    return updatedTodo;
   }
 
   static async deleteTodo(id: string, userId: string) {

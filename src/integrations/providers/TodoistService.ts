@@ -1,8 +1,10 @@
-import { Integration } from '../Integration';
+import { Integration, IntegrationTypeEnum } from '../Integration';
+let { TODOIST } = IntegrationTypeEnum;
 import { prisma } from '../../common';
 import { TodoistApiClient, TodoistItem } from './TodoistApi';
 import { TodoService } from '../../todos/TodoService';
 import { Todo } from '../../todos/Todo';
+import { ExternalTodoMapping } from '@prisma/client';
 
 // TODO: consider moving all Prisma code/DB interaction into the IntegrationService (in a unified way)
 export class TodoistService {
@@ -28,7 +30,7 @@ export class TodoistService {
     const todoistTasks = await apiClient.getAllItems();
 
     await this.saveTodoistItemsToDB(todoistTasks, integrationId, ownerId);
-    await this.copyTodosToTodoist(apiClient, localTodosToPush, integrationId);
+    await this.pushTodosToTodoist(apiClient, localTodosToPush, integrationId);
   }
 
   private static async saveTodoistItemsToDB(
@@ -53,12 +55,45 @@ export class TodoistService {
     );
   }
 
-  private static async copyTodosToTodoist(
+  static async pushSingleTodoToTodoist(integration: Integration, todo: Todo) {
+    const apiClient = new TodoistApiClient(
+      integration.details.apiKey as string,
+    );
+
+    return this.pushTodosToTodoist(apiClient, [todo], integration.id);
+  }
+
+  static async toggleTodoCompletionInTodoist(
+    externalTodoMapping: ExternalTodoMapping,
+    todo: Todo,
+  ) {
+    const integration = (await prisma.externalTodoMapping
+      .findFirst({
+        where: {
+          todoId: todo.id,
+          integration: {
+            type: TODOIST,
+          },
+        },
+      })
+      .integration()) as Integration;
+
+    const apiClient = new TodoistApiClient(
+      integration.details.apiKey as string,
+    );
+
+    return apiClient.toggleItemCompletion(
+      externalTodoMapping.externalTodoId,
+      Boolean(todo.completedAt),
+    );
+  }
+
+  private static async pushTodosToTodoist(
     apiClient: TodoistApiClient,
-    todoistTasks: Todo[],
+    todosToPush: Todo[],
     integrationId: string,
   ) {
-    const preparedDataForApi = todoistTasks.map((todo) => ({
+    const preparedDataForApi = todosToPush.map((todo) => ({
       content: todo.title,
       temp_id: todo.id,
     }));
