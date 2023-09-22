@@ -8,6 +8,7 @@ Any feedback or recommendations are much appreciated.
 ## How to launch
 
 ```sh
+cp .env_template_dev .env # create .env file out of the template
 docker compose up # launching PG
 npm i
 prisma migrate dev # apply DB migrations and execute seed
@@ -72,10 +73,15 @@ When the user is creating a new integration (OAuth or by providing API_KEY via g
 - (shortcut) I assume that reasonable Auth is out of scope for this project, but I've mocked auth (authenticated `userId` in the request context) for building proper DB models, relations, etc.   
 - (shortcut) Right now, calls to Todoist API is performed in a sync way. I believe it is enough for the POC, but for a real project this should be handled by query/emitting events, ideally to the external service (eg. RabbitMQ)  
 - (shortcut) Again, Todoist webhook handled is written in pseudocode
+- (shortcut) No docker file for the app (but it is mentioned in Todo section below!)
 - (assumption) Recurring tasks and many other things are out of scope
 - (assumption) Realtime / GraphQL subscriptions are out of scope
+- `docker compose` may look like an unnecessary piece since there is only one service there (PG). Yes, right now it is true, but I like to add docker-compose anyway, since:
+  - with time, the app will require additional services (e.g. Redis, RabbitMQ, etc.)
+  - it works as a clear documentation about necessary services and its version
 
 ## Todo
 - [ ] Add DB indexes, especially for querying todos
+- [ ] Add TSLint
 - [ ] Docker image for the app
 - [ ] Adding docker image to the docker compose for launching the whole stack via `docker compose up`
