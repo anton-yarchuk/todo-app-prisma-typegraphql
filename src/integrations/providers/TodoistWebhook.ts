@@ -1,5 +1,5 @@
 import { prisma } from '../../common';
-import { IntegrationTypeEnum } from '../Integration';
+import { IntegrationTypeEnum } from '../IntegrationTypes';
 
 // @ts-ignore
 expressRouter.post('/todoist-webhook', async (request, response) => {

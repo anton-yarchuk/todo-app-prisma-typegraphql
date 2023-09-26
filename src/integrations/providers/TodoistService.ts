@@ -1,10 +1,11 @@
-import { Integration, IntegrationTypeEnum } from '../Integration';
-let { TODOIST } = IntegrationTypeEnum;
+import { Integration } from '../Integration';
 import { prisma } from '../../common';
 import { TodoistApiClient, TodoistItem } from './TodoistApi';
 import { TodoService } from '../../todos/TodoService';
 import { Todo } from '../../todos/Todo';
 import { ExternalTodoMapping } from '@prisma/client';
+import { IntegrationTypeEnum } from '../IntegrationTypes';
+let { TODOIST } = IntegrationTypeEnum;
 
 // TODO: consider moving all Prisma code/DB interaction into the IntegrationService (in a unified way)
 export class TodoistService {

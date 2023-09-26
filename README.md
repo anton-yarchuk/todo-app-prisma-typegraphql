@@ -70,11 +70,11 @@ When the user is creating a new integration (OAuth or by providing API_KEY via g
   - The project grew more than I expected. For saving time, I decided not to implement the actual webhook (it required creating a Todoist App, handling OAuth etc.) but wrote it as a pseudocode ([pseudocode Todoist webhook handler](./src/integrations/providers/TodoistWebhook.ts)) based on Todoist API doc. I hope this is not an issue, since the logic there is quite straightforward.
 
 ## Assumptions and shortcut 
-- (shortcut) I assume that reasonable Auth is out of scope for this project, but I've mocked auth (authenticated `userId` in the request context) for building proper DB models, relations, etc.   
-- (shortcut) Right now, calls to Todoist API is performed in a sync way. I believe it is enough for the POC, but for a real project this should be handled by query/emitting events, ideally to the external service (eg. RabbitMQ)  
-- (shortcut) Again, Todoist webhook handled is written in pseudocode
-- (shortcut) No docker file for the app (but it is mentioned in Todo section below!)
-- (assumption) Recurring tasks and many other things are out of scope
+- (shortcut) I assume, that complete Auth flow is out of the scope for this project, so I've mocked it (by adding `userId` to the request context) for building proper DB models, relations, etc.   
+- (shortcut) There is no queueing for external calls (Todoist API calls). It works for POC, but with more time a queueing mechanism should be introduced (e.g. RabbitMQ)
+- (shortcut) Again, Todoist webhook handler is written in pseudocode
+- (shortcut) No docker file for the app (it is mentioned in Todo section below)
+- (assumption) Recurring tasks, tags, etc. are out of scope
 - (assumption) Realtime / GraphQL subscriptions are out of scope
 - `docker compose` may look like an unnecessary piece since there is only one service there (PG). Yes, right now it is true, but I like to add docker-compose anyway, since:
   - with time, the app will require additional services (e.g. Redis, RabbitMQ, etc.)

@@ -1,12 +1,9 @@
 import { prisma } from '../common';
-import {
-  Integration,
-  IntegrationTypeEnum,
-  TodoistIntegrationDetails,
-} from './Integration';
-let { TODOIST } = IntegrationTypeEnum;
+import { Integration, TodoistIntegrationDetails } from './Integration';
 import { TodoistService } from './providers/TodoistService';
 import { Todo } from '../todos/Todo';
+import { IntegrationTypeEnum } from './IntegrationTypes';
+let { TODOIST } = IntegrationTypeEnum;
 
 export class IntegrationService {
   static async connectToTodoistParty(
@@ -22,19 +19,16 @@ export class IntegrationService {
       },
     })) as Integration;
 
-    // TODO: emit and event instead of blocking the request
-    await TodoistService.doInitialSync(createdIntegration);
+    // TODO: publish an event instead of blocking the request; handle it in a separate flow or service
+    await IntegrationService.doInitialSync(createdIntegration, TODOIST);
 
     return createdIntegration;
   }
 
-  static async createTaskInExternalServices(
-    todo: Todo,
-    userId: string,
-  ): Promise<void> {
+  static async createTaskInExternalServices(todo: Todo): Promise<void> {
     const promises = [];
     const activeIntegrations = (await prisma.integration.findMany({
-      where: { ownerId: userId },
+      where: { ownerId: todo.ownerId },
     })) as Integration[];
 
     for (const integration of activeIntegrations) {
@@ -82,5 +76,19 @@ export class IntegrationService {
     }
 
     await Promise.all(promises);
+  }
+
+  static async doInitialSync(
+    integration: Integration,
+    type: IntegrationTypeEnum,
+  ) {
+    switch (type) {
+      case IntegrationTypeEnum.TODOIST: {
+        return TodoistService.doInitialSync(integration);
+      }
+      default: {
+        console.error(`doInitialSync: Unknown integration type - ${type}`);
+      }
+    }
   }
 }

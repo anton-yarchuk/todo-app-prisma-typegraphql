@@ -44,8 +44,8 @@ export class TodoService {
 
     const createdTodo = await prisma.todo.create({ data });
 
-    // TODO: fire an event instead and handle integrations separately instead of blocking the API call
-    await IntegrationService.createTaskInExternalServices(createdTodo, userId);
+    // TODO: publish an event instead of blocking the request; handle it in a separate flow or service
+    await IntegrationService.createTaskInExternalServices(createdTodo);
 
     return createdTodo;
   }
@@ -69,7 +69,7 @@ export class TodoService {
       },
     });
 
-    // TODO: fire an event instead and handle integrations separately instead of blocking the API call
+    // TODO: publish an event instead of blocking the request; handle it in a separate flow or service
     await IntegrationService.toggleTaskCompletionInExternalServices(
       updatedTodo,
     );

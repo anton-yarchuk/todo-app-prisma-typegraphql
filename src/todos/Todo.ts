@@ -33,4 +33,7 @@ export class Todo {
 
   @Field((type) => User)
   owner?: User;
+
+  // no @Field decorator, field is not accessible via API calls
+  ownerId: string;
 }

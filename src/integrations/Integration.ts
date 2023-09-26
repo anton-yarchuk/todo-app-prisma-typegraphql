@@ -1,7 +1,8 @@
 import 'reflect-metadata';
-import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
+import { ObjectType, Field, ID } from 'type-graphql';
 import { User } from '../users/User';
 import { JsonObject } from '@prisma/client/runtime/library';
+import { IntegrationTypeEnum } from './IntegrationTypes';
 
 @ObjectType()
 export class TodoistIntegrationDetails {
@@ -29,11 +30,3 @@ export class Integration {
   // no @Field decorator, field is not accessible via API calls
   ownerId: string;
 }
-
-export enum IntegrationTypeEnum {
-  TODOIST = 'TODOIST',
-}
-
-registerEnumType(IntegrationTypeEnum, {
-  name: 'IntegrationTypeEnum',
-});
