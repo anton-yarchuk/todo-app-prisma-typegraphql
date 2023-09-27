@@ -9,13 +9,13 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  name        String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  lists       List[]
-  todos       Todo[]
-  Integration Integration[]
+  id           String        @id @default(uuid())
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  lists        List[]
+  todos        Todo[]
+  Integrations Integration[]
 }
 
 model List {
@@ -46,7 +46,7 @@ model Todo {
 
 model Integration {
   id               String            @id @default(uuid())
-  type             String
+  type             String // Todoist, Google Calendar, etc. see `IntegrationTypeEnum`
   createdAt        DateTime          @default(now())
   owner            User              @relation(fields: [ownerId], references: [id])
   ownerId          String
@@ -55,10 +55,12 @@ model Integration {
 }
 
 model ExternalTodoRef {
-  externalTodoId String      @id
+  externalTodoId String
   todoId         String
   todo           Todo        @relation(fields: [todoId], references: [id])
   createdAt      DateTime    @default(now())
   integration    Integration @relation(fields: [integrationId], references: [id])
   integrationId  String
+
+  @@id([externalTodoId, todoId])
 }
