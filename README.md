@@ -9,12 +9,14 @@ Any feedback or recommendations are much appreciated.
 
 ```sh
 cp .env_template_dev .env # create .env file out of the template
-docker compose up # launching PG
+docker compose up # launching Postgres
 npm i
-prisma migrate dev # apply DB migrations and execute seed
+npx prisma migrate dev # apply DB migrations and execute seed
 
 npm run dev
 ```
+
+Access the local sandbox on http://localhost:4000/
 
 ## How third-party integration is working
 
@@ -22,7 +24,10 @@ The app is integrated with Todoist via Todoist Sync API.
 
 ### Data model:
 
-Each `User` may have multiple `Integration`s. A single integration looks like:
+When a user is integrating with a third-party todo tool, a new `Integration` record is created. The relation here is one-to-many, so a user may be integrated to multiple services (e.g Todoist and Google Calendar) or have multiple integrations
+with the same service (e.g. work and personal Google Calendars)
+
+A single integration looks like:
 
 ```json5
 {
@@ -34,54 +39,57 @@ Each `User` may have multiple `Integration`s. A single integration looks like:
 }
 ```
 
-This way a user may be integrated to multiple services (e.g Todoist and Google Calendar) or have multiple integrations
-with the same service (e.g. work and personal Google Calendars)
-
-Also, for each `Todo` item in our DB, we are creating multiple `ExternalTodoRefs` for mapping between native todos and external ones:
+During the initial synchronization, for each `Todo` record of a user, we are creating a `ExternalTodoRef` record (one-to-one relation) for keeping track of connections between local todos and a todo items on a third-party side. In case of multiple integrations connected at the same time, multiple `ExternalTodoRef` records will be created for a single local `Todo` record. Example:
 
 ```json5
 [
   {
     "todoId": "our_todo_ID_1",
-    "integrationId": "TOD_000", // TODOIST
+    "integrationId": "TOD_000", // TODOIST integration of our user
     "externalTodoId": "todoist_ID_1"
   },
   {
     "todoId": "our_todo_ID_1", // the same task
-    "integrationId": "GOOG_111", // GOOGLE CALENDAR
+    "integrationId": "GOOG_111", // GOOGLE CALENDAR integration of the same user
     "externalTodoId": "g_cal_ID_1"
   }
 ]
 ```
 
-### How sync works:
+### How the sync works:
 
-#### Initial sync
+#### 1. Initial sync
 
 When the user is creating a new integration (OAuth or by providing API_KEY via graphql mutation) the app is performing a full sync:
 
-- Fetches all tasks from the Todoist and creates necessary `ExternalTodoRefs`
-- Pushes all local tasks to the Todoist and creates necessary `ExternalTodoRefs`
+- Fetches all items(todos) from the Todoist, saves these as `Todo`s records in the local DB. Also, we are creating necessary `ExternalTodoRefs` for linking between these two
+- All local `Todo`s are pushed to the Todoist via API. Also, necessary `ExternalTodoRefs` records as saved in the DB.
 
-#### Keeping data in sync
+At the end of this stage, we have the same list of todos in both systems + we have mapping/referencing info 
 
-- When something is changing on our end, mapped Todoist's items are updated via API ([Todoist API client](./src/integrations/providers/TodoistApi.ts))
-- When something is changing on the Todoist's side, Todoist service is notifying us via `wehbook request`
-  - The project grew more than I expected. For saving time, I decided not to implement the actual webhook (it required creating a Todoist App, handling OAuth etc.) but wrote it as a pseudocode ([pseudocode Todoist webhook handler](./src/integrations/providers/TodoistWebhook.ts)) based on Todoist API doc. I hope this is not an issue, since the logic there is quite straightforward.
+#### 2. Keeping data in sync
 
-## Assumptions and shortcut 
-- (shortcut) I assume, that complete Auth flow is out of the scope for this project, so I've mocked it (by adding `userId` to the request context) for building proper DB models, relations, etc.   
-- (shortcut) There is no queueing for external calls (Todoist API calls). It works for POC, but with more time a queueing mechanism should be introduced (e.g. RabbitMQ)
-- (shortcut) Again, Todoist webhook handler is written in pseudocode
-- (shortcut) No docker file for the app (it is mentioned in Todo section below)
-- (assumption) Recurring tasks, tags, etc. are out of scope
-- (assumption) Realtime / GraphQL subscriptions are out of scope
-- `docker compose` may look like an unnecessary piece since there is only one service there (PG). Yes, right now it is true, but I like to add docker-compose anyway, since:
+- When something is changing on our end - we are updating todos on Todoist's side via API ([Todoist API client](./src/integrations/providers/TodoistApi.ts))
+- When something is changing on the Todoist's side - The Todoist is notifying us via `wehbook request`
+  - _Note: The project grew more than I expected. For saving time, I decided to shortcut the webhook code. I'm planning to finish it later if I will have a spare time. Nevertheless, I've written it as pseudocode ([pseudocode Todoist webhook handler](./src/integrations/providers/TodoistWebhook.ts)) based on Todoist API docs. I hope this is not an issue, since the logic there is quite straightforward and the end result will look very close to this pseudocode. LMK_
+
+## Assumptions and Shortcut
+- Some of a CRUD actions are not implemented. I've implemented only those mentioned in the challenge description + some more, but, for example, there is no action for deleting a `todo list`.
+- I assume, that complete Auth flow is out of the scope for this project, so I've replaced it by simply adding `userId` to the request context. This way I was able to build proper DB models, relations, filtering, etc. LMK   
+- There is no queueing for external API calls. It works for POC, but with time, a queueing mechanism should be introduced (e.g. RabbitMQ). Especially it is required for initial sync since it may take some time and we don't want to block the request for the whole process.
+- As mentioned above - the Todoist webhook handler is written in pseudocode
+- There is no Docker file yet (but it is mentioned in Todo section below)
+
+## Assumptions
+- Recurring tasks, tags, lists syncing etc. are out of the scope.
+- Realtime / GraphQL subscriptions are out of the scope (but it's almost a must for integration with a third party service in background)
+- `docker compose` may look like an unnecessary piece since there is only one service there (Postgres). It is true, but imho it is a nice to have thing because:
   - with time, the app will require additional services (e.g. Redis, RabbitMQ, etc.)
-  - it works as a clear documentation about necessary services and its version
+  - it works as a nice documentation about necessary external services, including version, some parts of configurations, etc.
 
 ## Todo
 - [ ] Add DB indexes, especially for querying todos
 - [ ] Add TSLint
+- [ ] Implement and debug the Todoist webhook code
 - [ ] Docker image for the app
 - [ ] Adding docker image to the docker compose for launching the whole stack via `docker compose up`
