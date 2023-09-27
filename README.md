@@ -37,7 +37,7 @@ Each `User` may have multiple `Integration`s. A single integration looks like:
 This way a user may be integrated to multiple services (e.g Todoist and Google Calendar) or have multiple integrations
 with the same service (e.g. work and personal Google Calendars)
 
-Also, for each `Todo` item in our DB, we are creating multiple `ExternalTodoMappings` for mapping between native todos and external ones:
+Also, for each `Todo` item in our DB, we are creating multiple `ExternalTodoRefs` for mapping between native todos and external ones:
 
 ```json5
 [
@@ -60,8 +60,8 @@ Also, for each `Todo` item in our DB, we are creating multiple `ExternalTodoMapp
 
 When the user is creating a new integration (OAuth or by providing API_KEY via graphql mutation) the app is performing a full sync:
 
-- Fetches all tasks from the Todoist and creates necessary `ExternalTodoMappings`
-- Pushes all local tasks to the Todoist and saves mapping
+- Fetches all tasks from the Todoist and creates necessary `ExternalTodoRefs`
+- Pushes all local tasks to the Todoist and creates necessary `ExternalTodoRefs`
 
 #### Keeping data in sync
 

@@ -30,31 +30,31 @@ model List {
 }
 
 model Todo {
-  id                   String                @id @default(uuid())
-  title                String
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  dueDate              DateTime?
-  completedAt          DateTime?
-  deletedAt            DateTime?
-  owner                User                  @relation(fields: [ownerId], references: [id])
-  ownerId              String
-  list                 List?                 @relation(fields: [listId], references: [id])
-  listId               String?
-  externalTodoMappings ExternalTodoMapping[]
+  id               String            @id @default(uuid())
+  title            String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  dueDate          DateTime?
+  completedAt      DateTime?
+  deletedAt        DateTime?
+  owner            User              @relation(fields: [ownerId], references: [id])
+  ownerId          String
+  list             List?             @relation(fields: [listId], references: [id])
+  listId           String?
+  externalTodoRefs ExternalTodoRef[]
 }
 
 model Integration {
-  id                   String                @id @default(uuid())
-  type                 String
-  createdAt            DateTime              @default(now())
-  owner                User                  @relation(fields: [ownerId], references: [id])
-  ownerId              String
-  externalTodoMappings ExternalTodoMapping[]
-  details              Json // results to JSONB field in PG
+  id               String            @id @default(uuid())
+  type             String
+  createdAt        DateTime          @default(now())
+  owner            User              @relation(fields: [ownerId], references: [id])
+  ownerId          String
+  externalTodoRefs ExternalTodoRef[]
+  details          Json // results to JSONB field in PG
 }
 
-model ExternalTodoMapping {
+model ExternalTodoRef {
   externalTodoId String      @id
   todoId         String
   todo           Todo        @relation(fields: [todoId], references: [id])

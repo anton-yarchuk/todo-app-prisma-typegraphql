@@ -3,7 +3,7 @@ import { prisma } from '../../common';
 import { TodoistApiClient, TodoistItem } from './TodoistApi';
 import { TodoService } from '../../todos/TodoService';
 import { Todo } from '../../todos/Todo';
-import { ExternalTodoMapping } from '@prisma/client';
+import { ExternalTodoRef } from '@prisma/client';
 import { IntegrationTypeEnum } from '../IntegrationTypes';
 let { TODOIST } = IntegrationTypeEnum;
 
@@ -13,7 +13,7 @@ export class TodoistService {
    * Performs initial sync which contains of 2 steps:
    *   1. Fetching all items from Todoist and saving it into the DB
    *   2. Sends all local todos to the Todoist
-   * On both steps, mapping between Todoist item ID and local TodoID is saved as externalTodoMapping records
+   * On both steps, mapping between Todoist item ID and local TodoID is saved as externalTodoRef records
    */
   static async doInitialSync(createdIntegration: Integration): Promise<void> {
     const apiClient = new TodoistApiClient(
@@ -41,7 +41,7 @@ export class TodoistService {
   ) {
     await prisma.$transaction(
       todoistTasks.map((todoistTask) =>
-        prisma.externalTodoMapping.create({
+        prisma.externalTodoRef.create({
           data: {
             externalTodoId: todoistTask.id,
             integration: {
@@ -65,10 +65,10 @@ export class TodoistService {
   }
 
   static async toggleTodoCompletionInTodoist(
-    externalTodoMapping: ExternalTodoMapping,
+    externalTodoRef: ExternalTodoRef,
     todo: Todo,
   ) {
-    const integration = (await prisma.externalTodoMapping
+    const integration = (await prisma.externalTodoRef
       .findFirst({
         where: {
           todoId: todo.id,
@@ -84,7 +84,7 @@ export class TodoistService {
     );
 
     return apiClient.toggleItemCompletion(
-      externalTodoMapping.externalTodoId,
+      externalTodoRef.externalTodoId,
       Boolean(todo.completedAt),
     );
   }
@@ -104,7 +104,7 @@ export class TodoistService {
       await apiClient.createItemsInInbox(preparedDataForApi);
 
     // Creating local mapping between existing Todos and freshly created Todoist items
-    await prisma.externalTodoMapping.createMany({
+    await prisma.externalTodoRef.createMany({
       data: Object.keys(createdItemsResponse).map((todoId) => ({
         externalTodoId: createdItemsResponse[todoId],
         todoId,

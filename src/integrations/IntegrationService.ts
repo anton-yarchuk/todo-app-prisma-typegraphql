@@ -50,7 +50,7 @@ export class IntegrationService {
     todo: Todo,
   ): Promise<void> {
     const promises = [];
-    const externalTodoMappings = await prisma.externalTodoMapping.findMany({
+    const externalTodoRefs = await prisma.externalTodoRef.findMany({
       where: { todoId: todo.id },
       include: {
         integration: true,
@@ -58,19 +58,16 @@ export class IntegrationService {
     });
 
     // For each mapping of a task, prepare a promise for toggling completion in third-party service
-    for (const externalTodoMapping of externalTodoMappings) {
-      switch (externalTodoMapping.integration.type) {
+    for (const externalTodoRef of externalTodoRefs) {
+      switch (externalTodoRef.integration.type) {
         case TODOIST:
           promises.push(
-            TodoistService.toggleTodoCompletionInTodoist(
-              externalTodoMapping,
-              todo,
-            ),
+            TodoistService.toggleTodoCompletionInTodoist(externalTodoRef, todo),
           );
           break;
         default:
           console.error(
-            `Unknown type of integration - ${externalTodoMapping.integration.type}`,
+            `Unknown type of integration - ${externalTodoRef.integration.type}`,
           );
       }
     }

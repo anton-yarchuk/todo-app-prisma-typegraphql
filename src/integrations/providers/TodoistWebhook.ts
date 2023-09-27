@@ -35,7 +35,7 @@ expressRouter.post('/todoist-webhook', async (request, response) => {
             },
           },
           // Create a new mapping item for future updates between our service and Todoist
-          externalTodoMappings: {
+          externalTodoRefs: {
             create: {
               externalTodoId: requestPayload.event_data.id,
               integration: {
@@ -51,20 +51,20 @@ expressRouter.post('/todoist-webhook', async (request, response) => {
 
     case 'item:completed':
     case 'item:uncompleted':
-      // Item already should be in DB, so we already should have externalTodoMapping.
-      const externalTodoMapping = await prisma.externalTodoMapping.findFirst({
+      // Item already should be in DB, so we already should have externalTodoRef.
+      const externalTodoRef = await prisma.externalTodoRef.findFirst({
         where: {
           externalTodoId: requestPayload.event_data.id,
           integration: { id: integration.id },
         },
       });
 
-      // If, for some reason, we don't have externalTodoMapping in DB (race condition?) - we can create it, no problem
+      // If, for some reason, we don't have externalTodoRef in DB (race condition?) - we can create it, no problem
 
       // Update existing todoItem in the DB
       await prisma.todo.update({
         where: {
-          id: externalTodoMapping.todoId,
+          id: externalTodoRef.todoId,
         },
         data: {
           completedAt: requestPayload.event_data.completed_at
