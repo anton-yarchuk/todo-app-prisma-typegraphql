@@ -6,12 +6,21 @@ I decided to make this project more educational for myself, so I've picked some 
 Any feedback or recommendations are much appreciated.
 
 ## How to launch
+```sh
+docker compose up
+```
+
+or manually:
 
 ```sh
 cp .env_template_dev .env # create .env file out of the template
-docker compose up # launching Postgres
+
+docker compose up -d database # launching Postgres
+
 npm i
-npx prisma migrate dev # apply DB migrations and execute seed
+
+npx prisma migrate dev # apply DB migrations
+npx prisma db seed # apply DB seed
 
 npm run dev
 ```
@@ -78,18 +87,14 @@ At the end of this stage, we have the same list of todos in both systems + we ha
 - I assume, that complete Auth flow is out of the scope for this project, so I've replaced it by simply adding `userId` to the request context. This way I was able to build proper DB models, relations, filtering, etc. LMK   
 - There is no queueing for external API calls. It works for POC, but with time, a queueing mechanism should be introduced (e.g. RabbitMQ). Especially it is required for initial sync since it may take some time and we don't want to block the request for the whole process.
 - As mentioned above - the Todoist webhook handler is written in pseudocode
-- There is no Docker file yet (but it is mentioned in Todo section below)
 
 ## Assumptions
 - Recurring tasks, tags, lists syncing etc. are out of the scope.
 - Realtime / GraphQL subscriptions are out of the scope (but it's almost a must for integration with a third party service in background)
-- `docker compose` may look like an unnecessary piece since there is only one service there (Postgres). It is true, but imho it is a nice to have thing because:
-  - with time, the app will require additional services (e.g. Redis, RabbitMQ, etc.)
-  - it works as a nice documentation about necessary external services, including version, some parts of configurations, etc.
 
 ## Todo
 - [ ] Add DB indexes, especially for querying todos
 - [ ] Add TSLint
 - [ ] Implement and debug the Todoist webhook code
-- [ ] Docker image for the app
-- [ ] Adding docker image to the docker compose for launching the whole stack via `docker compose up`
+- [x] ~~Docker image for the app~~
+- [x] ~~Adding docker image to the docker compose for launching the whole stack via `docker compose up`~~

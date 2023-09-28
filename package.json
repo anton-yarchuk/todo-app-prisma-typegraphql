@@ -2,15 +2,21 @@
   "name": "todo-app-prisma-typegraphql",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --no-notify --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --no-notify --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "migrate-dev": "prisma migrate dev"
+  },
+  "engines": {
+    "node": "16"
   },
   "prisma": {
-    "seed": "ts-node prisma/dev_db_seed.ts"
+    "seed": "node prisma/dev_db_seed.js"
   },
   "dependencies": {
     "@apollo/server": "4.9.3",

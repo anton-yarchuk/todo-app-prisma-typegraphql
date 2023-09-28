@@ -1,10 +1,37 @@
-version: '3'
+version: '3.7'
 
 services:
-#  TODO: add docker file and include it here as a service
+  graphql_server:
+    image: graphql_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env_template_dev
+    depends_on:
+      - database
+    network_mode: 'host'
+  db_migration:
+    image: graphql_server
+    command: sh -c "npx prisma migrate dev && npx prisma db seed"
+    env_file:
+      - .env_template_dev
+    depends_on:
+      graphql_server:
+        condition: service_started
+      database:
+        condition: service_healthy
+    network_mode: 'host'
   database:
     image: 'postgres:latest'
     ports:
       - 5432:5432
     env_file:
-      - .env
+      - .env_template_dev
+    network_mode: 'host'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'db_prod']
+      interval: 3s
+      timeout: 10s
+      retries: 5
+      start_period: 2s
