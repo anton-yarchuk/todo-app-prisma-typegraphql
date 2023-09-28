@@ -17,6 +17,10 @@ import { IntegrationResolver } from './integrations/IntegrationResolver';
     resolvers: [TodoResolver, UserResolver, ListResolver, IntegrationResolver],
     scalarsMap: [{ type: Date, scalar: tq.GraphQLTimestamp }],
     validate: true,
+    emitSchemaFile: {
+      path: __dirname + '/schema.graphql',
+      sortedSchema: false,
+    },
   });
 
   const server = new ApolloServer<Context>({ schema });
