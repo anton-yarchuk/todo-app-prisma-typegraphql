@@ -24,8 +24,6 @@ services:
     network_mode: 'host'
   database:
     image: 'postgres:latest'
-    ports:
-      - 5432:5432
     env_file:
       - .env_template_dev
     network_mode: 'host'
