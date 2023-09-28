@@ -8,10 +8,10 @@ import { TodoistIntegrationDetailsInput } from './IntegrationTypes';
 @Resolver(Integration)
 export class IntegrationResolver {
   @Mutation((returns) => Integration)
-  async createTodoistIntegration(
+  async integrateWithTodoist(
     @Arg('data') input: TodoistIntegrationDetailsInput,
     @Ctx() ctx: Context,
   ) {
-    return IntegrationService.connectToTodoistParty(ctx.userId, input);
+    return IntegrationService.integrateUserWithTodoist(ctx.userId, input);
   }
 }

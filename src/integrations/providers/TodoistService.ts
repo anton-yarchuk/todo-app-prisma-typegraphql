@@ -11,7 +11,7 @@ let { TODOIST } = IntegrationTypeEnum;
 export class TodoistService {
   /**
    * Performs initial sync which contains of 2 steps:
-   *   1. Fetching all items from Todoist and saving it into the DB
+   *   1. Fetching all items from the Todoist and saving it into the DB
    *   2. Sends all local todos to the Todoist
    * On both steps, mapping between Todoist item ID and local TodoID is saved as externalTodoRef records
    */
@@ -24,7 +24,7 @@ export class TodoistService {
     const integrationId = createdIntegration.id;
 
     const localTodosToPush = await TodoService.getOwnTodos(
-      { take: 100 },
+      {},
       createdIntegration.ownerId,
     );
 
@@ -112,6 +112,4 @@ export class TodoistService {
       })),
     });
   }
-
-  // TODO: add todoist webhook
 }

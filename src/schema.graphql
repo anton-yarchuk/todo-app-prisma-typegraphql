@@ -51,7 +51,7 @@ type Mutation {
   deleteTodo(id: String!): Todo!
   createList(data: CreateListInput!): List!
   updateList(data: CreateListInput!, id: String!): List!
-  createTodoistIntegration(data: TodoistIntegrationDetailsInput!): Integration!
+  integrateWithTodoist(data: TodoistIntegrationDetailsInput!): Integration!
 }
 
 input CreateTodoInput {

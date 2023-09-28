@@ -25,7 +25,7 @@ import { IntegrationResolver } from './integrations/IntegrationResolver';
 
   const server = new ApolloServer<Context>({ schema });
 
-  // Mocking auth logic
+  // Mocking auth logic by adding a default userId (created via DB seed) to the request context
   if (process.env.MOCK_USER_ID) {
     context.userId = process.env.MOCK_USER_ID;
   }

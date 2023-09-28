@@ -10,7 +10,8 @@ export class TodoService {
   static async getOwnTodos(args: TodosArgs, userId: string): Promise<Todo[]> {
     const data: Prisma.TodoFindManyArgs = {
       skip: args.skip || 0,
-      take: args.take || 20,
+      // If not provided in GraphQL request, this field will contain a default value
+      take: args.take || undefined,
       where: {
         ownerId: userId,
         completedAt: args.includeCompleted ? undefined : null,
@@ -44,13 +45,15 @@ export class TodoService {
 
     const createdTodo = await prisma.todo.create({ data });
 
-    // TODO: publish an event instead of blocking the request; handle it in a separate flow or service
-    await IntegrationService.createTaskInExternalServices(createdTodo);
+    // TODO: publish an event to a queue instead of blocking the request; handle the sync in a parallel flow
+    await IntegrationService.createTaskInAllIntegratedServices(createdTodo);
 
     return createdTodo;
   }
 
   static async updateTodo(id: string, data: CreateTodoInput, userId: string) {
+    // TODO: implement a sync to all external services for updates
+
     return prisma.todo.update({
       where: { id, ownerId: userId },
       data,
@@ -69,8 +72,8 @@ export class TodoService {
       },
     });
 
-    // TODO: publish an event instead of blocking the request; handle it in a separate flow or service
-    await IntegrationService.toggleTaskCompletionInExternalServices(
+    // TODO: publish an event to a queue instead of blocking the request; handle the sync in a parallel flow
+    await IntegrationService.toggleTaskCompletionInAllIntegratedServices(
       updatedTodo,
     );
 

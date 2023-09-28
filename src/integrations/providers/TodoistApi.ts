@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { randomUUID } from 'crypto';
 
+/**
+ * A wrapper around the Todoist Sync API
+ */
 export class TodoistApiClient {
   // Obtainable via todoist.com (Settings > Integrations > Developer > Copy API token)
   private readonly apiKey: string;
@@ -10,7 +13,7 @@ export class TodoistApiClient {
   }
 
   /**
-   * Fetches all items(tasks) via Todoist API
+   * Fetches all items(tasks) of a user from all Todoist lists
    */
   async getAllItems(): Promise<TodoistItem[]> {
     // TODO: incremental sync via sync_token for splitting request into chunks
@@ -22,7 +25,9 @@ export class TodoistApiClient {
   }
 
   /**
-   * Created new Todoist Items and returns mapping between temp_id(TodoId) and Todoist ItemId
+   * Creates multiple Todoist items(todos) in the "Inbox" list
+   *
+   * @returns {Promise} mapping between Todoist ItemId and temp_id(which represents TodoId in the DB)
    */
   async createItemsInInbox(
     data: TodoistItemCreateCommand[],
@@ -42,6 +47,9 @@ export class TodoistApiClient {
     return response?.data?.temp_id_mapping;
   }
 
+  /**
+   * Toggles an item completion field
+   */
   async toggleItemCompletion(
     itemId: string,
     isCompleted: boolean,

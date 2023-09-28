@@ -82,8 +82,9 @@ At the end of this stage, we have the same list of todos in both systems + we ha
 - When something is changing on the Todoist's side - The Todoist is notifying us via `wehbook request`
   - _Note: The project grew more than I expected. For saving time, I decided to shortcut the webhook code. I'm planning to finish it later if I will have a spare time. Nevertheless, I've written it as pseudocode ([pseudocode Todoist webhook handler](./src/integrations/providers/TodoistWebhook.ts)) based on Todoist API docs. I hope this is not an issue, since the logic there is quite straightforward and the end result will look very close to this pseudocode. LMK_
 
-## Assumptions and Shortcut
+## Shortcuts
 - Some of a CRUD actions are not implemented. I've implemented only those mentioned in the challenge description + some more, but, for example, there is no action for deleting a `todo list`.
+- Only a default sorting for todos and lists is available at the moment
 - I assume, that complete Auth flow is out of the scope for this project, so I've replaced it by simply adding `userId` to the request context. This way I was able to build proper DB models, relations, filtering, etc. LMK   
 - There is no queueing for external API calls. It works for POC, but with time, a queueing mechanism should be introduced (e.g. RabbitMQ). Especially it is required for initial sync since it may take some time and we don't want to block the request for the whole process.
 - As mentioned above - the Todoist webhook handler is written in pseudocode
@@ -93,6 +94,8 @@ At the end of this stage, we have the same list of todos in both systems + we ha
 - Realtime / GraphQL subscriptions are out of the scope (but it's almost a must for integration with a third party service in background)
 
 ## Todo
+- [ ] Implement synchronization for todo update (currently only completion flag is synced) 
+- [ ] Consider renaming of `Todo` into a `Task` 
 - [ ] Add DB indexes, especially for querying todos
 - [ ] Add TSLint
 - [ ] Implement and debug the Todoist webhook code

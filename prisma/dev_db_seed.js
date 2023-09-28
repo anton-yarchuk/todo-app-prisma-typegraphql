@@ -1,9 +1,11 @@
+/* This file is written in plain JS for being able to execute in both environments: from the source and from the docker container */
 require('dotenv/config');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // A default user with a few todos
   await prisma.user.create({
     data: {
       id: process.env.MOCK_USER_ID,
@@ -39,6 +41,7 @@ async function main() {
     },
   });
 
+  // A second user, added for testing that todos of other users are not leaking into the response
   await prisma.user.create({
     data: {
       name: 'Second user, invisible in dev',

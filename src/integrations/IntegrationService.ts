@@ -5,8 +5,11 @@ import { Todo } from '../todos/Todo';
 import { IntegrationTypeEnum } from './IntegrationTypes';
 let { TODOIST } = IntegrationTypeEnum;
 
+/**
+ * An Integration record represents an active connection between the app and another third party todo app
+ */
 export class IntegrationService {
-  static async connectToTodoistParty(
+  static async integrateUserWithTodoist(
     userId: string,
     details: TodoistIntegrationDetails,
   ): Promise<Integration> {
@@ -19,13 +22,13 @@ export class IntegrationService {
       },
     })) as Integration;
 
-    // TODO: publish an event instead of blocking the request; handle it in a separate flow or service
-    await IntegrationService.doInitialSync(createdIntegration, TODOIST);
+    // TODO: publish an event to a queue instead of blocking the request; handle the sync in a parallel flow
+    await IntegrationService.doInitialSync(createdIntegration);
 
     return createdIntegration;
   }
 
-  static async createTaskInExternalServices(todo: Todo): Promise<void> {
+  static async createTaskInAllIntegratedServices(todo: Todo): Promise<void> {
     const promises = [];
     const activeIntegrations = (await prisma.integration.findMany({
       where: { ownerId: todo.ownerId },
@@ -46,7 +49,7 @@ export class IntegrationService {
     await Promise.all(promises);
   }
 
-  static async toggleTaskCompletionInExternalServices(
+  static async toggleTaskCompletionInAllIntegratedServices(
     todo: Todo,
   ): Promise<void> {
     const promises = [];
@@ -57,7 +60,7 @@ export class IntegrationService {
       },
     });
 
-    // For each mapping of a task, prepare a promise for toggling completion in third-party service
+    // For each mapping of a task, prepare a promise for toggling completion in a third-party service
     for (const externalTodoRef of externalTodoRefs) {
       switch (externalTodoRef.integration.type) {
         case TODOIST:
@@ -75,16 +78,15 @@ export class IntegrationService {
     await Promise.all(promises);
   }
 
-  static async doInitialSync(
-    integration: Integration,
-    type: IntegrationTypeEnum,
-  ) {
-    switch (type) {
+  static async doInitialSync(integration: Integration) {
+    switch (integration.type) {
       case IntegrationTypeEnum.TODOIST: {
         return TodoistService.doInitialSync(integration);
       }
       default: {
-        console.error(`doInitialSync: Unknown integration type - ${type}`);
+        console.error(
+          `doInitialSync: Unknown integration type - ${integration.type}`,
+        );
       }
     }
   }

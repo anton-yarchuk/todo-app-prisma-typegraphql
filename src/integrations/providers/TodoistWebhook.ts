@@ -51,7 +51,7 @@ expressRouter.post('/todoist-webhook', async (request, response) => {
 
     case 'item:completed':
     case 'item:uncompleted':
-      // Item already should be in DB, so we already should have externalTodoRef.
+      // The item should already be in the DB, so we already should have an externalTodoRef.
       const externalTodoRef = await prisma.externalTodoRef.findFirst({
         where: {
           externalTodoId: requestPayload.event_data.id,
@@ -59,7 +59,7 @@ expressRouter.post('/todoist-webhook', async (request, response) => {
         },
       });
 
-      // If, for some reason, we don't have externalTodoRef in DB (race condition?) - we can create it, no problem
+      // If, for some reason, we don't have an externalTodoRef in DB (race condition?) - no problem, treat it as an 'item:added' event
 
       // Update existing todoItem in the DB
       await prisma.todo.update({
@@ -76,7 +76,7 @@ expressRouter.post('/todoist-webhook', async (request, response) => {
       break;
   }
 
-  // TODO: Add additional items such as 'item:updated', 'item:deleted', etc.
+  // TODO: Add the full list of related events such as 'item:updated', 'item:deleted', etc.
 
   return response.status(200).send(`OK`);
 });
