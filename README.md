@@ -27,6 +27,10 @@ npm run dev
 
 Access the local sandbox on http://localhost:4000/
 
+## DB model
+
+![](https://i.imgur.com/M5MZ1dN.png)
+
 ## How third-party integration is working
 
 The app is integrated with Todoist via Todoist Sync API.
@@ -83,10 +87,17 @@ At the end of this stage, we have the same list of todos in both systems + we ha
   - _Note: The project grew more than I expected. For saving time, I decided to shortcut the webhook code. I'm planning to finish it later if I will have a spare time. Nevertheless, I've written it as pseudocode ([pseudocode Todoist webhook handler](./src/integrations/providers/TodoistWebhook.ts)) based on Todoist API docs. I hope this is not an issue, since the logic there is quite straightforward and the end result will look very close to this pseudocode. LMK_
 
 ## Shortcuts
-- Some of a CRUD actions are not implemented. I've implemented only those mentioned in the challenge description + some more, but, for example, there is no action for deleting a `todo list`.
+I'm assuming that the main focus of this assignment is: 
+1. Necessary, minimalistic API for the basic actions on todos
+2. The data model and the algorithm behind a third party integration
+
+Because of that, I'm cutting out a lot of features that I would expect to see in a regular todo app, such as:
+
+- A lot of common features (tags, recurring tasks, etc.) were cutoff. Let me know if you want me to prepare a more complex data model which will include all these features.
+- Some of CRUD actions are not implemented. I've implemented only those mentioned in the challenge description + some more, but, for example, there is no action for deleting a `todo list`.
 - Only a default sorting for todos and lists is available at the moment
-- I assume, that complete Auth flow is out of the scope for this project, so I've replaced it by simply adding `userId` to the request context. This way I was able to build proper DB models, relations, filtering, etc. LMK   
-- There is no queueing for external API calls. It works for POC, but with time, a queueing mechanism should be introduced (e.g. RabbitMQ). Especially it is required for initial sync since it may take some time and we don't want to block the request for the whole process.
+- I assume, that a complete Auth flow is out of the scope for this project, so I'm imitating it by adding `userId` to the request context. This way I was able to build proper DB models, relations, filtering, etc. LMK   
+- There is no queueing for external API calls. It works for POC, but with time, a queueing mechanism should be introduced (e.g. RabbitMQ). Especially it is required for initial sync since it may take some time, and we don't want to block the request for the whole process.
 - As mentioned above - the Todoist webhook handler is written in pseudocode
 
 ## Assumptions
